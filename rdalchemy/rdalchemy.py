@@ -1419,27 +1419,45 @@ class _RDKitMolFunctions(object):
                 Descriptors.NumAromaticHeterocycles,
                 type_=Integer,
                 help="Returns the number of aromatic heterocycles in a molecule")
-    formula = _rdkit_function(
-                'mol_formula', 
+    mol_formula = _rdkit_function(
+                'mol_formula',
                 Chem.rdMolDescriptors.CalcMolFormula,
                 type_=String,
                 help='Returns a string with the molecular formula. The second '
                      'argument controls whether isotope information is '
                      'included in the formula; the third argument controls '
                      'whether "D" and "T" are used instead of [2H] and [3H].')
-
+    num_spiro = _rdkit_function(
+                'num_spiro',
+                Chem.rdMolDescriptors.CalcNumSpiroAtoms,
+                type_=Integer,
+                help='Returns a int with the number of spiro atoms (atoms shared between '
+                     'rings that share exactly one atom).')
+    gyration_radius = _rdkit_function(
+                'gyration_radius',
+                Chem.rdMolDescriptors.CalcRadiusOfGyration,
+                type_=Float,
+                help='Returns a float with the radius of gyration.')
+    spherocity = _rdkit_function(
+                'spherocity',
+                Chem.rdMolDescriptors.CalcSpherocityIndex,
+                type_=Float,
+                help='Returns a float with the spherocity index.')
+    asphericity = _rdkit_function(
+                'asphericity',
+                Chem.rdMolDescriptors.CalcAsphericity,
+                type_=Float,
+                help='Returns a float with the asphericity.')
     fractioncsp3 = _rdkit_function(
                 'mol_fractioncsp3',
                 Chem.rdMolDescriptors.CalcFractionCSP3,
                 type_=Float,
                 help="Returns the fraction of C atoms that are SP3 hybridized")
-
     to_pkl = _rdkit_function(
                 'mol_to_pkl',
                 Chem.Mol.ToBinary,
                 type_=BINARY,
                 sql_cast_out='bytea')
-
     inchi = _rdkit_function(
                 'mol_inchi', 
                 Chem.MolToInchi,
@@ -1448,7 +1466,6 @@ class _RDKitMolFunctions(object):
                 help='Returns an InChI for the molecule. (available '
                      'from the 2011_06 release, requires that the RDKit be '
                      'uilt with InChI support).')
-
     inchikey = _rdkit_function(
                 'mol_inchikey', 
                 lambda m: Chem.InchiToInchiKey(Chem.MolToInchi(m)),
@@ -1457,13 +1474,11 @@ class _RDKitMolFunctions(object):
                 help='Returns an InChI key for the molecule. (available '
                      'from the 2011_06 release, requires that the RDKit be '
                      'uilt with InChI support).')
-
     rdkit_fp = _rdkit_function(
                 'rdkit_fp',
                 Chem.RDKFingerprint,
                 as_property=True,
                 type_=Bfp)
-            
     morgan_fp = _rdkit_function(
                 'morganbv_fp',
                 Chem.rdMolDescriptors.GetMorganFingerprintAsBitVect,
