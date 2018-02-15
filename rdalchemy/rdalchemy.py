@@ -720,6 +720,7 @@ class RDKitMolProperties(object):
     hbd = instrumented_property('hbd') 
     num_atoms = instrumented_property('num_atoms')
     num_heavy_atoms = instrumented_property('num_heavy_atoms')
+    mol_formula = instrumented_property('mol_formula')
     num_rotatable_bonds = instrumented_property('num_rotatable_bonds')
     num_hetero_atoms = instrumented_property('num_hetero_atoms')
     num_rings = instrumented_property('num_rings')
@@ -1423,31 +1424,11 @@ class _RDKitMolFunctions(object):
                 'mol_formula',
                 Chem.rdMolDescriptors.CalcMolFormula,
                 type_=String,
+                sql_cast_out='bpchar',
                 help='Returns a string with the molecular formula. The second '
                      'argument controls whether isotope information is '
                      'included in the formula; the third argument controls '
                      'whether "D" and "T" are used instead of [2H] and [3H].')
-    num_spiro = _rdkit_function(
-                'num_spiro',
-                Chem.rdMolDescriptors.CalcNumSpiroAtoms,
-                type_=Integer,
-                help='Returns a int with the number of spiro atoms (atoms shared between '
-                     'rings that share exactly one atom).')
-    gyration_radius = _rdkit_function(
-                'gyration_radius',
-                Chem.rdMolDescriptors.CalcRadiusOfGyration,
-                type_=Float,
-                help='Returns a float with the radius of gyration.')
-    spherocity = _rdkit_function(
-                'spherocity',
-                Chem.rdMolDescriptors.CalcSpherocityIndex,
-                type_=Float,
-                help='Returns a float with the spherocity index.')
-    asphericity = _rdkit_function(
-                'asphericity',
-                Chem.rdMolDescriptors.CalcAsphericity,
-                type_=Float,
-                help='Returns a float with the asphericity.')
     fractioncsp3 = _rdkit_function(
                 'mol_fractioncsp3',
                 Chem.rdMolDescriptors.CalcFractionCSP3,
@@ -1644,6 +1625,8 @@ if __name__ == '__main__':
         sub_id = Column('sub_id', Integer, primary_key=True)
         structure = Column('smiles', Mol)
         num_heavy_atoms = Column('n_hvy_atoms', Integer)
+        mol_formula = Column('mol_formula', String)
+        num_rings = Column('num_rings', Integer)
         name = Column('name', String)
         
         @property
