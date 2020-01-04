@@ -11,7 +11,6 @@ import contextlib
 import functools
 import numbers
 import operator
-import string
 import types
 
 import numpy as np
@@ -39,7 +38,7 @@ from rdkit.Chem import Descriptors, rdchem
 from rdkit.Chem.Draw import MolToImage
 from rdkit.Chem.rdDistGeom import EmbedMolecule
 
-_all_bytes = string.maketrans('', '')
+# _all_bytes = str.maketrans('', '')
 
 
 class ChemistryError(ValueError):
@@ -85,11 +84,13 @@ class CustomEqualityBinaryExpression_HACK(elements.BinaryExpression):
 
 
 def _remove_control_characters(data):
-    if not isinstance(data, basestring):
+    if not isinstance(data, str):
         raise ValueError("Data must be a string")
     else:
         data = str(data)
-    return data.translate(_all_bytes, _all_bytes[:32])
+    # return data.translate(_all_bytes, _all_bytes[:32])
+    # return data.translate(_all_bytes)
+    return data.encode('ascii',errors='ignore')
 
 
 ## Datatype Converstions
@@ -199,7 +200,7 @@ MOL_PARSERS = [
 
 def attempt_mol_coersion(data, sanitize=True, exclude=()):
      # RDKit doesn't like Unicode
-    if isinstance(data, (basestring, buffer)):
+    if isinstance(data, (str, )):
         data = str(data)
     
     # Record all parsing errors
@@ -233,7 +234,7 @@ def infer_mol_format(data, sanitize=True, exclude=()):
 
 def chunks(xs, k):
     n = len(xs)
-    for i in xrange(0, n, k):
+    for i in range(0, n, k):
         yield xs[i:i+k]
         
 def byte_from_hex(value):
@@ -271,7 +272,7 @@ def bfp_to_raw_binary_text(bfp):
     return bfp.ToBinary()
     
 def bytes_from_binary_text(binary_text):
-    if not isinstance(binary_text, basestring):
+    if not isinstance(binary_text, str):
         raise ValueError("Binary text must be a string")
     if binary_text.startswith(r'\x'):
         binary_text = binary_text[2:]
@@ -415,7 +416,7 @@ def attempt_bfp_conversion(data, size=None, method=None, raw_method=None):
         mol = data.as_mol
     elif hasattr(data, 'mol'):
         mol = data.mol
-    elif raw_method is not None and isinstance(data, basestring) and '\x00' not in data:
+    elif raw_method is not None and isinstance(data, str) and '\x00' not in data:
         try:
             mol = raw_method(data)
         except (ValueError, TypeError, AttributeError) as error:
@@ -427,7 +428,7 @@ def attempt_bfp_conversion(data, size=None, method=None, raw_method=None):
         else:
             raise ValueError("Attempting to generate bfp from Mol "
                              "but no method provided")
-    elif isinstance(data, (basestring, buffer)):
+    elif isinstance(data, (str, )):
         data = str(data)
 
     
@@ -878,7 +879,7 @@ class BinaryMolElement(_ExplicitMolElement):
     frontend_coerce = 'binary'
 
     def __init__(self, mol, _force_sanitized=True, _inchi_options=''):
-        if isinstance(mol, basestring):
+        if isinstance(mol, str):
             mol = bytes(mol)
         super(BinaryMolElement, self).__init__(mol,
                                                _force_sanitized=_force_sanitized,
@@ -988,9 +989,9 @@ class BfpElement(_RDKitDataElement, expression.Function, RDKitBfpProperties):
                                      raw_method=self._raw_method)
         return self._fp
     
-    @property
-    def as_binary(self):
-        return bfp_to_binary(self.as_bfp)
+    # @property
+    # def as_binary(self):
+    #     return bfp_to_binary(self.as_bfp)
     
     @property
     def as_bytes(self):
@@ -1651,13 +1652,13 @@ if __name__ == '__main__':
     
     
     aspirin = db.query(Substance).filter(Substance.sub_id==53).one()
-    print aspirin.smiles
-    print aspirin.structure.as_pdb
+    print(aspirin.smiles)
+    print(aspirin.structure.as_pdb)
     
     tenbenz = db.query(Substance)\
                 .filter(Substance.structure.contains('c1cccccc1'))\
                 .limit(10)
     
     for substance in tenbenz:
-        print substance.sub_id, substance.smarts
+        print(substance.sub_id, substance.smarts)
 

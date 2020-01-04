@@ -1,4 +1,4 @@
-from rdalchemy import (
+from .rdalchemy import (
     Mol,
     BinaryMol,
     Bfp, 
