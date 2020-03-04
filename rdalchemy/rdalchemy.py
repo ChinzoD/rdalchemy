@@ -200,7 +200,7 @@ MOL_PARSERS = [
 
 def attempt_mol_coersion(data, sanitize=True, exclude=()):
      # RDKit doesn't like Unicode
-    if isinstance(data, (str, )):
+    if isinstance(data, str):
         data = str(data)
     
     # Record all parsing errors
@@ -279,22 +279,22 @@ def bytes_from_binary_text(binary_text):
     else:
         raise ValueError("Binary text must be hex-encoded and prefixed with '\\x'")
     byte_chunks = list(chunks(binary_text, 2))
-    byte_values = map(byte_from_hex, byte_chunks)
+    byte_values = list(map(byte_from_hex, byte_chunks))
     values = np.array(byte_values, dtype=np.uint8)
     return values
 
 def bytes_to_binary_text(byte_values):
-    hex_chars = map(byte_to_hex, byte_values)
+    hex_chars = list(map(byte_to_hex, byte_values))
     binary_text = r'\x' + ''.join(hex_chars)
     return binary_text
 
 def bytes_from_chars(chars):
-    byte_values = map(ord, chars)
+    byte_values = list(map(ord, chars))
     values = np.array(byte_values, dtype=np.uint8)
     return values
 
 def bytes_to_chars(byte_values):
-    char_values = map(chr, byte_values)
+    char_values = list(map(chr, byte_values))
     chars = ''.join(char_values)
     return chars
 
@@ -303,7 +303,7 @@ def bfp_from_bits(bits, size=None):
         raise ValueError("Cannot create BFP from on-bit list without explicit size")
     if not all(isinstance(idx, (numbers.Integral, np.integer, int)) for idx in bits):
         try:
-            bits = map(int, bits)
+            bits = list(map(int, bits))
         except ValueError:
             raise ValueError("Can only create BFP from collection of integers")
     vect = DataStructs.ExplicitBitVect(size)
@@ -428,7 +428,7 @@ def attempt_bfp_conversion(data, size=None, method=None, raw_method=None):
         else:
             raise ValueError("Attempting to generate bfp from Mol "
                              "but no method provided")
-    elif isinstance(data, (str, )):
+    elif isinstance(data, str):
         data = str(data)
 
     
